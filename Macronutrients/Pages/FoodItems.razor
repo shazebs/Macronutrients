@@ -1,0 +1,26 @@
+﻿@page "/fooditems"
+@using Macronutrients.Data
+@using Macronutrients.Models
+
+<PageTitle>Food Items</PageTitle>
+
+@if (nutrients.Count != 0)
+{
+    @foreach (var e in nutrients)
+    {
+        <span class="NutrientItem" onclick="@(() => NutrientClick(e.Name))">@e.Name</span><br/>
+    }
+}
+else
+{
+    <p>No Food Data exists.</p>
+}
+
+@code {
+    private List<Nutrient> nutrients = FoodDataService.getNutrients();
+
+    private void NutrientClick(string parameter)
+    {
+        Console.WriteLine(parameter);
+    }
+}

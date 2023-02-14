@@ -1,0 +1,7 @@
+﻿.NutrientItem {
+    font-size:22px;
+}
+.NutrientItem:hover {
+    cursor:pointer;
+    color:dodgerblue;
+}
