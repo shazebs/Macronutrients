@@ -1,10 +1,12 @@
 ﻿@page "/fooditems"
 @using Macronutrients.Data
 @using Macronutrients.Models
+@using Macronutrients.Components
+@using Microsoft.AspNetCore.Components.Forms
 
 <PageTitle>Food Items</PageTitle>
 
-@if (nutrients.Count != 0)
+@if (nutrients != null && nutrients.Count != 0)
 {
     @foreach (var e in nutrients)
     {
@@ -16,11 +18,26 @@ else
     <p>No Food Data exists.</p>
 }
 
+@*<EditFoodModal></EditFoodModal>*@
+
+<EditForm Model="@newFood" OnSubmit="@HandleNewFood()">
+    <InputText id="name" @bind-Value="newFood.Name"/>
+    <button type="submit">Add Food</button>
+</EditForm>
+
 @code {
-    private List<Nutrient> nutrients = FoodDataService.getNutrients();
+    private Food newFood = new(); 
+
+    private List<Nutrient> nutrients;// = FoodDataService.getNutrients();
 
     private void NutrientClick(string parameter)
     {
         Console.WriteLine(parameter);
+    }
+
+    private EventCallback HandleNewFood()
+    {
+        Console.WriteLine(newFood.Name);
+        return new EventCallback(); 
     }
 }
