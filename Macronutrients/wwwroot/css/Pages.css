@@ -22,6 +22,10 @@
     border-bottom:1px solid dodgerblue;
 }
 
+.FoodItem label {
+    width: 60px;
+}
+
 .FoodName {
     font-size:22px;
 }

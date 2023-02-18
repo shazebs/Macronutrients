@@ -17,9 +17,11 @@
             {
                 @foreach (var food in foods)
                 {
-                    <div class="FoodItem">                        
+                    <div class="FoodItem" onclick="@(() => EditFoodClick(food))">                        
                         <span class="FoodName">@food.Name</span><br/>
-                        <span class="">Protein: @food.Protein</span> <span class="spacer">--</span> <span class="">Carbs: @food.Carbs</span> <span class="spacer">--</span> <span class="">Fats: @food.Fats</span><br />
+                        <label>Protein:</label> <span>@food.Protein g</span><br />
+                        <label>Carbs:</label> <span>@food.Carbs g</span><br />
+                        <label>Fats:</label> <span>@food.Fats g</span><br />
                     </div>
                 }
             }
@@ -30,7 +32,7 @@
         </div>
         <div id="ShowMacronutrients">Macronutrients</div>
         <div id="AddFoodForm">
-            Add Food Form<br/>
+            Food Form<br/>
             <EditForm id="EditFoodModal" Model="@newFood" OnValidSubmit="@HandleNewFood">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
@@ -39,7 +41,8 @@
                 <label>Carbs</label> <InputNumber @bind-Value="@newFood.Carbs"/><br />
                 <label>Fats</label> <InputNumber @bind-Value="@newFood.Fats" /><br />
                 <br />
-                <button type="submit">Add Food</button>
+                <button type="submit">Submit</button>
+                <button type="button" @onclick="ResetFoodForm">Reset</button>
             </EditForm>
         </div>
     </section>
@@ -47,15 +50,27 @@
 </section>
 
 @code {
-    private Food newFood = new(); 
+    private Food newFood { get; set; } = new Food(); 
 
     private List<Food> foods = FoodDataService.GetAllFoods(); 
 
-    private async void HandleNewFood()
+    private void HandleNewFood()
     {
-        FoodDataService.CreateNewFood(newFood);
-        foods = FoodDataService.GetAllFoods();
-        newFood = new ();
+        newFood.Name = newFood.Name.Trim();
+        var result = FoodDataService.CreateNewFood(newFood);
+        if (result) foods = FoodDataService.GetAllFoods();
+        newFood = new Food();
+    }
+
+    private void EditFoodClick(Food food)
+    {
+        newFood = food;
+        StateHasChanged();
+    }
+
+    private void ResetFoodForm()
+    {
+        newFood = new Food();
     }
 }
 
