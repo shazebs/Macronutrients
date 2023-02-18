@@ -4,55 +4,59 @@
 @using Macronutrients.Components
 @using Microsoft.AspNetCore.Components.Forms
 @using System.Runtime.InteropServices.JavaScript
+@using System.ComponentModel.DataAnnotations
 
 <PageTitle>Food Items</PageTitle>
-
-<EditForm id="EditFoodModal" Model="@newFood" OnSubmit="@HandleNewFood()">
-    <InputText id="name" @bind-Value="newFood.Name" />
-    <button type="submit">Add Food</button>
-    <br />
-</EditForm>
 
 <section id="FoodItemsPage">    
     <section id="FoodItemsPage-Header">Header</section>
     <section id="FoodItemsPage-Body">
-        <div id="AllFoodsList">All Foods</div>
+        <div id="AllFoodsList">
+            All Foods<br />
+            @if (foods != null && foods.Count != 0)
+            {
+                @foreach (var food in foods)
+                {
+                    <div class="FoodItem">                        
+                        <span class="FoodName">@food.Name</span><br/>
+                        <span class="">Protein: @food.Protein</span> <span class="spacer">--</span> <span class="">Carbs: @food.Carbs</span> <span class="spacer">--</span> <span class="">Fats: @food.Fats</span><br />
+                    </div>
+                }
+            }
+            else
+            {
+                <p>No Food Data exists.</p>
+            }
+        </div>
         <div id="ShowMacronutrients">Macronutrients</div>
         <div id="AddFoodForm">
-            Add Food Form
+            Add Food Form<br/>
+            <EditForm id="EditFoodModal" Model="@newFood" OnValidSubmit="@HandleNewFood">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <label>Name</label> <InputText @bind-Value="@newFood.Name" /><br />
+                <label>Protein</label> <InputNumber @bind-Value="@newFood.Protein" /><br />
+                <label>Carbs</label> <InputNumber @bind-Value="@newFood.Carbs"/><br />
+                <label>Fats</label> <InputNumber @bind-Value="@newFood.Fats" /><br />
+                <br />
+                <button type="submit">Add Food</button>
+            </EditForm>
         </div>
     </section>
     <section id="FoodItemsPage-Footer">Footer</section>
 </section>
 
-@*@if (nutrients != null && nutrients.Count != 0)
-{
-    @foreach (var e in nutrients)
-    {
-        <span class="NutrientItem" onclick="@(() => NutrientClick(e.Name))">@e.Name</span><br/>
-    }
-}
-else
-{
-    <p>No Food Data exists.</p>
-}
-*@
-
-@*<EditFoodModal></EditFoodModal>*@
-
 @code {
     private Food newFood = new(); 
 
-    private List<Nutrient> nutrients;// = FoodDataService.getNutrients();
+    private List<Food> foods = FoodDataService.GetAllFoods(); 
 
-    private void NutrientClick(string parameter)
+    private async void HandleNewFood()
     {
-        Console.WriteLine(parameter);
-    }
-
-    private EventCallback HandleNewFood()
-    {
-        Console.WriteLine(newFood.Name);
-        return new EventCallback(); 
+        FoodDataService.CreateNewFood(newFood);
+        foods = FoodDataService.GetAllFoods();
+        newFood = new ();
     }
 }
+
+@*onclick="@(() => NutrientClick(food.Name))"*@

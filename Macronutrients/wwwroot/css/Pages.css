@@ -7,15 +7,25 @@
 #AllFoodsList {
     width: 100%;
     border: 1px solid yellow;
+    overflow-y:auto;
 }
 
 #EditFoodModal {
-    display: none;
+    display: block;
 }
 
-.NutrientItem {
+#EditFoodModal label {
+    width:55px;
+}
+
+.FoodItem {
+    border-bottom:1px solid dodgerblue;
+}
+
+.FoodName {
     font-size:22px;
 }
+
 .NutrientItem:hover {
     cursor:pointer;
     color:dodgerblue;
@@ -55,4 +65,8 @@
     width: 100%;
     border: 1px solid black;
     width: 100%;
+}
+
+.spacer {
+    color:dodgerblue;
 }
