@@ -3,10 +3,29 @@
 @using Macronutrients.Models
 @using Macronutrients.Components
 @using Microsoft.AspNetCore.Components.Forms
+@using System.Runtime.InteropServices.JavaScript
 
 <PageTitle>Food Items</PageTitle>
 
-@if (nutrients != null && nutrients.Count != 0)
+<EditForm id="EditFoodModal" Model="@newFood" OnSubmit="@HandleNewFood()">
+    <InputText id="name" @bind-Value="newFood.Name" />
+    <button type="submit">Add Food</button>
+    <br />
+</EditForm>
+
+<section id="FoodItemsPage">    
+    <section id="FoodItemsPage-Header">Header</section>
+    <section id="FoodItemsPage-Body">
+        <div id="AllFoodsList">All Foods</div>
+        <div id="ShowMacronutrients">Macronutrients</div>
+        <div id="AddFoodForm">
+            Add Food Form
+        </div>
+    </section>
+    <section id="FoodItemsPage-Footer">Footer</section>
+</section>
+
+@*@if (nutrients != null && nutrients.Count != 0)
 {
     @foreach (var e in nutrients)
     {
@@ -17,13 +36,9 @@ else
 {
     <p>No Food Data exists.</p>
 }
+*@
 
 @*<EditFoodModal></EditFoodModal>*@
-
-<EditForm Model="@newFood" OnSubmit="@HandleNewFood()">
-    <InputText id="name" @bind-Value="newFood.Name"/>
-    <button type="submit">Add Food</button>
-</EditForm>
 
 @code {
     private Food newFood = new(); 

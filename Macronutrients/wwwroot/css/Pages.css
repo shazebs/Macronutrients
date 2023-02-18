@@ -1,7 +1,58 @@
-﻿.NutrientItem {
+﻿
+#AddFoodForm {
+    width: 100%;
+    border: 1px solid red;
+}
+
+#AllFoodsList {
+    width: 100%;
+    border: 1px solid yellow;
+}
+
+#EditFoodModal {
+    display: none;
+}
+
+.NutrientItem {
     font-size:22px;
 }
 .NutrientItem:hover {
     cursor:pointer;
     color:dodgerblue;
+}
+
+#FoodItemsPage {
+    display:flex;
+    flex-direction:column;
+    border:1px solid dodgerblue;
+    height:90vh;
+}
+
+#FoodItemsPage-Body {
+    display:flex;
+    justify-content:space-evenly;
+    height:80%;
+    border:2px solid orange;
+}
+
+#FoodItemsPage-Body div {
+    padding:10px;
+}
+
+#FoodItemsPage-Footer {
+    height: 10%;
+    border: 2px solid green;
+    padding: 10px;
+}
+
+#FoodItemsPage-Header {
+    height:10%;
+    border:2px solid black;
+    padding:10px;
+}
+
+#ShowMacronutrients {
+    width: 100%;
+    border: 1px solid black;
+    width: 100%;
 }
