@@ -212,7 +212,7 @@ namespace Macronutrients.Data
             return null;
         }
 
-        public static void DeleteFoodById(int id)
+        public static bool DeleteFoodById(int id)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
@@ -224,11 +224,11 @@ namespace Macronutrients.Data
                     int rowsAffected = command.ExecuteNonQuery();
                     if (rowsAffected > 0)
                     {
-                        Console.WriteLine("Successful delete.");
+                        return true;
                     }
                     else
                     {
-                        Console.WriteLine("Delete failure.");
+                        return false;
                     }
                 }
             }

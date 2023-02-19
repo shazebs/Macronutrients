@@ -12,37 +12,65 @@
     <section id="FoodItemsPage-Header">Header</section>
     <section id="FoodItemsPage-Body">
         <div id="AllFoodsList">
-            All Foods<br />
             @if (foods != null && foods.Count != 0)
             {
-                @foreach (var food in foods)
+                @foreach (var food in allFoods)
                 {
-                    <div class="FoodItem" onclick="@(() => EditFoodClick(food))">                        
-                        <span class="FoodName">@food.Name</span><br/>
-                        <label>Protein:</label> <span>@food.Protein g</span><br />
-                        <label>Carbs:</label> <span>@food.Carbs g</span><br />
-                        <label>Fats:</label> <span>@food.Fats g</span><br />
+                    <div class="FoodItem">                        
+                        <span class="FoodName">@food.Key.Name</span><br/>
+                        <section class="FoodItem-Details">
+                            <section class="FoodItem-Values">
+                                <label>Protein:</label> <span>@food.Key.Protein g</span><br />
+                                <label>Carbs:</label> <span>@food.Key.Carbs g</span><br />
+                                <label>Fats:</label> <span>@food.Key.Fats g</span><br />
+                            </section>
+                            <section class="spacer">
+                                <input type="number" min="0" style="width:100%;" @onchange="(e) => HandleNumberChange(e, food.Key)" value="@food.Value"/>
+                            </section>
+                            <section class="FoodItem-Actions">
+                                <button onclick="@(() => EditFoodClick(food.Key))">Edit</button>
+                                <button onclick="@(() => DeleteFoodClick(food.Key.FoodId))">Delete</button>
+                            </section>
+                        </section>
                     </div>
                 }
             }
             else
             {
-                <p>No Food Data exists.</p>
+                <p><i>No Food Data exists.</i></p>
             }
         </div>
-        <div id="ShowMacronutrients">Macronutrients</div>
+        <div id="ShowMacronutrients">
+            Macronutrients<hr/>
+            @if (allFoods.Count != 0)
+            {
+                <label>Foods:</label> <span>@addedFoodsList</span>
+                <br /><br/>
+                <label>Protein:</label> <span>@totalProtein g</span>
+                <br />
+                <label>Carbs:</label> <span>@totalCarbs g</span>
+                <br />
+                <label>Fats:</label> <span>@totalFats g</span>
+                <br/>
+                <label>Calories:</label> <span>@totalCalories</span>
+            }
+            else
+            {
+                <p><i>Add Foods from the list to view nutritional values.</i></p>
+            }
+        </div>
         <div id="AddFoodForm">
-            Food Form<br/>
+            Food Form<hr />
             <EditForm id="EditFoodModal" Model="@newFood" OnValidSubmit="@HandleNewFood">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
                 <label>Name</label> <InputText @bind-Value="@newFood.Name" /><br />
-                <label>Protein</label> <InputNumber @bind-Value="@newFood.Protein" /><br />
-                <label>Carbs</label> <InputNumber @bind-Value="@newFood.Carbs"/><br />
-                <label>Fats</label> <InputNumber @bind-Value="@newFood.Fats" /><br />
+                <label>Protein</label> <InputNumber @bind-Value="@newFood.Protein" min="0" /><br />
+                <label>Carbs</label> <InputNumber @bind-Value="@newFood.Carbs" min="0" /><br />
+                <label>Fats</label> <InputNumber @bind-Value="@newFood.Fats" min="0" /><br />
                 <br />
                 <button type="submit">Submit</button>
-                <button type="button" @onclick="ResetFoodForm">Reset</button>
+                <button type="button" @onclick="ClearFoodForm">Reset</button>
             </EditForm>
         </div>
     </section>
@@ -52,25 +80,106 @@
 @code {
     private Food newFood { get; set; } = new Food(); 
 
-    private List<Food> foods = FoodDataService.GetAllFoods(); 
+    private Dictionary<Food, int> addedFoods { get; set; } = new Dictionary<Food, int>();
+
+    private List<Food> foods = FoodDataService.GetAllFoods();
+    public Dictionary<Food, int> allFoods { get; set; }
+
+    protected override void OnInitialized()
+    {
+        allFoods = new Dictionary<Food, int>();
+        foreach (var e in foods)
+        {
+            allFoods.Add(e, 0);
+        }
+    }
 
     private void HandleNewFood()
     {
         newFood.Name = newFood.Name.Trim();
         var result = FoodDataService.CreateNewFood(newFood);
-        if (result) foods = FoodDataService.GetAllFoods();
+        if (result) 
+        {
+            foods = FoodDataService.GetAllFoods();
+            SetAllFoods();
+        }
         newFood = new Food();
+        CalculateMacronutrients();
     }
 
     private void EditFoodClick(Food food)
     {
         newFood = food;
+        StateHasChanged(); 
+    }
+
+    private void ClearFoodForm()
+    {
+        newFood = new Food();
+    }
+
+    private string addedFoodsList { get; set; } = "";
+    private decimal totalProtein = 0.0M; 
+    private decimal totalCarbs = 0.0M;
+    private decimal totalFats = 0.0M;
+    private decimal totalCalories = 0.0M;
+
+    private void HandleNumberChange(ChangeEventArgs e, Food food)
+    {
+        int value = Convert.ToInt32(e.Value.ToString().Split('.')[0]);
+        var match = allFoods.FirstOrDefault(x => x.Key.FoodId == food.FoodId);
+        allFoods[match.Key] = value;
+        CalculateMacronutrients();
+    }
+
+    private void CalculateMacronutrients()
+    {
+        addedFoodsList = "";
+        totalProtein = 0.0M;
+        totalCarbs = 0.0M;
+        totalFats = 0.0M;
+        foreach (var x in allFoods)
+        {
+            if (x.Value != 0)
+            {
+                addedFoodsList += $"{x.Key.Name} [{x.Value}], ";
+                totalProtein = (totalProtein + (x.Key.Protein * x.Value));
+                totalCarbs = totalCarbs + (x.Key.Carbs * x.Value);
+                totalFats = totalFats + (x.Key.Fats * x.Value);                
+            }
+        }
+        totalCalories = (totalProtein + totalCarbs) * 4 + (totalFats * 9);
+    }
+
+    private void DeleteFoodClick(int id)
+    {
+        if (FoodDataService.DeleteFoodById(id))
+        {
+            var match = allFoods.FirstOrDefault(x => x.Key.FoodId == id);
+            allFoods.Remove(match.Key); 
+        }
+        foods = FoodDataService.GetAllFoods();
+        SetAllFoods(); 
+        CalculateMacronutrients();
         StateHasChanged();
     }
 
-    private void ResetFoodForm()
+    private void SetAllFoods()
     {
-        newFood = new Food();
+        var allFoodsCopy = allFoods; 
+        allFoods = new Dictionary<Food, int>(); 
+        foreach (var food in foods)
+        {
+            var match = allFoodsCopy.FirstOrDefault(x => x.Key.FoodId == food.FoodId);
+            if (match.Key == null)
+            {
+                allFoods.Add(food, 0); 
+            }
+            else
+            {
+                allFoods.Add(food, match.Value); 
+            }
+        }
     }
 }
 

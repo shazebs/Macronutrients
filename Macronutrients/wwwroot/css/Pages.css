@@ -2,6 +2,7 @@
 #AddFoodForm {
     width: 100%;
     border: 1px solid red;
+    overflow-y: auto;
 }
 
 #AllFoodsList {
@@ -24,6 +25,20 @@
 
 .FoodItem label {
     width: 60px;
+}
+
+.FoodItem-Actions {
+    text-align:right;
+    width: 100%;
+}
+
+.FoodItem-Details {
+    display: flex;
+    justify-content: space-between;
+}
+
+.FoodItem-Values {
+    width:100%;
 }
 
 .FoodName {
@@ -69,8 +84,39 @@
     width: 100%;
     border: 1px solid black;
     width: 100%;
+    overflow-y: auto;
+}
+
+#ShowMacronutrients label {
+    width: 60px;
 }
 
 .spacer {
-    color:dodgerblue;
+    width:50%;
+}
+
+@media (max-width:1000px) {
+    #AddFoodForm {
+        height:90%;
+    }
+
+    #AllFoodsList {
+        max-height:335px;
+    }
+
+    #FoodItemsPage {
+        height:85%;
+    }
+
+    #FoodItemsPage-Body {
+        flex-direction: column;
+    }
+
+    #FoodItemsPage-Header, #FoodItemsPage-Footer {
+        display:none;
+    }
+
+    #ShowMacronutrients {
+        height: 90%;
+    }
 }
