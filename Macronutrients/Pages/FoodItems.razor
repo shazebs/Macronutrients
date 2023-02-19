@@ -79,9 +79,6 @@
 
 @code {
     private Food newFood { get; set; } = new Food(); 
-
-    private Dictionary<Food, int> addedFoods { get; set; } = new Dictionary<Food, int>();
-
     private List<Food> foods = FoodDataService.GetAllFoods();
     public Dictionary<Food, int> allFoods { get; set; }
 
