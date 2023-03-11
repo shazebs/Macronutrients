@@ -6,32 +6,46 @@
 @using System.Runtime.InteropServices.JavaScript
 @using System.ComponentModel.DataAnnotations
 
-<PageTitle>Foods Tracker</PageTitle>
+<PageTitle>Food Items</PageTitle>
 
 <section id="FoodItemsPage">
+    @* Top side header container *@
     <section id="FoodItemsPage-Header">Header</section>
     <section id="FoodItemsPage-Body">
+        @* Left-side container for all foods list.*@
         <div id="AllFoodsList">
+            @* As long as there are foods list is not empty... *@
             @if (foods != null && foods.Count != 0)
             {
+                @* Loop through each index in all foods list *@
                 @foreach (var food in allFoods)
                 {
                     <div class="FoodItem">
+                        @* Print food item's name *@
                         <span class="FoodName">@food.Key.Name</span><br />
+                        @* Left container for food item's nutritional content *@
                         <section class="FoodItem-Details">
                             <section class="FoodItem-Values">
+                                @* Display Protein *@
                                 <label>Protein:</label> <span>@food.Key.Protein g</span>
                                 <br />
+                                @* Display Carbs *@
                                 <label>Carbs:</label> <span>@food.Key.Carbs g</span>
                                 <br />
+                                @* Display Fats *@
                                 <label>Fats:</label> <span>@food.Key.Fats g</span>
                                 <br />
                             </section>
+                            @* Middle container for number of servings input scrollwheel *@
                             <section class="spacer">
+                                @* Handle an onchange event for the number of servings input scrollwheel *@
                                 <input type="number" min="0" style="width:100%;" @onchange="(e) => HandleNumberChange(e, food.Key)" value="@food.Value" />
                             </section>
+                            @* Right container for onclick event buttons *@
                             <section class="FoodItem-Actions">
+                                @* Edit food item button *@
                                 <button onclick="@(() => EditFoodClick(food.Key))">Edit</button>
+                                @* Delete food item button *@
                                 <button onclick="@(() => DeleteFoodClick(food.Key.FoodId))">Delete</button>
                             </section>
                         </section>
@@ -40,45 +54,63 @@
             }
             else
             {
+                @* Display a message if no food items exists in the all foods list.*@
                 <p><i>No Food Data exists.</i></p>
             }
         </div>
+        @* Middle container for macronutrients summary *@
         <div id="ShowMacronutrients">
             Macronutrients<hr />
+            @* If values exist for these global properties, display the calculations *@
             @if (allFoods.Count != 0)
             {
+                @* Display Foods *@
                 <label>Foods:</label> <span>@addedFoodsList</span>
                 <br />
 
                 <br />
+                @* Display Protein *@
                 <label>Protein:</label> <span>@totalProtein g</span>
                 <br />
+                @* Display Carbs *@
                 <label>Carbs:</label> <span>@totalCarbs g</span>
                 <br />
+                @* Display Fats *@
                 <label>Fats:</label> <span>@totalFats g</span>
                 <br />
+                @* Display Calories *@
                 <label>Calories:</label> <span>@totalCalories</span>
             }
             else
             {
+                @* Display a message if no macronutrient values have been assigned a value. *@
                 <p><i>Add Foods from the list to view nutritional values.</i></p>
             }
         </div>
+        @* Right side container to add/edit food items *@
         <div id="AddFoodForm">
             Food Form<hr />
+            @* Blazor/Razor form component with onsubmit event handler *@
             <EditForm id="EditFoodModal" Model="@newFood" OnValidSubmit="@HandleNewFood">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
+                @* Name input *@
                 <label>Name</label> <InputText @bind-Value="@newFood.Name" /><br />
+                @* Protein input *@
                 <label>Protein</label> <InputNumber @bind-Value="@newFood.Protein" min="0" /><br />
+                @* Carbs input *@
                 <label>Carbs</label> <InputNumber @bind-Value="@newFood.Carbs" min="0" /><br />
+                @* Fats input *@
                 <label>Fats</label> <InputNumber @bind-Value="@newFood.Fats" min="0" /><br />
                 <br />
+                @* Submit/Update food item in the sql table database *@
                 <button type="submit">Submit</button>
+                @* Reset all values in the food edit form *@
                 <button type="button" @onclick="ClearFoodForm">Reset</button>
             </EditForm>
         </div>
     </section>
+    @* Footer container *@
     <section id="FoodItemsPage-Footer">Footer</section>
 </section>
 
@@ -86,7 +118,7 @@
     // Properties
     private Food newFood { get; set; } = new Food();
     private List<Food> foods = FoodDataService.GetAllFoods();
-    public Dictionary<Food, int> allFoods { get; set; }
+    public Dictionary<Food, int> allFoods { get; set; } = new Dictionary<Food, int>();
     private string addedFoodsList { get; set; } = "";
     private decimal totalProtein = 0.0M;
     private decimal totalCarbs = 0.0M;
@@ -98,11 +130,7 @@
     /// </summary>
     protected override void OnInitialized()
     {
-        allFoods = new Dictionary<Food, int>();
-        foreach (var e in foods)
-        {
-            allFoods.Add(e, 0);
-        }
+        foreach (var food in foods) allFoods.Add(food, 0);
     }
 
     /// <summary>
@@ -201,14 +229,8 @@
         foreach (var food in foods)
         {
             var match = allFoodsCopy.FirstOrDefault(x => x.Key.FoodId == food.FoodId);
-            if (match.Key == null)
-            {
-                allFoods.Add(food, 0);
-            }
-            else
-            {
-                allFoods.Add(food, match.Value);
-            }
+            if (match.Key == null) allFoods.Add(food, 0);
+            else allFoods.Add(food, match.Value);
         }
     }
 }

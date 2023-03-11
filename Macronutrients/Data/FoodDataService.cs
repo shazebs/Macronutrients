@@ -1,12 +1,11 @@
 ﻿using Macronutrients.Models;
 using System.Data.SqlClient;
-using Xunit;
 
 namespace Macronutrients.Data
 {
     public class FoodDataService
     {
-        private static readonly string connectionString = "Data Source=(localdb)\\ProjectModels;Initial Catalog=Macronutrients;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+        private static readonly string connectionString = @"Server=tcp:macronutrientsdbserver.database.windows.net,1433;Initial Catalog=Macronutrients_db;Persist Security Info=False;User ID=healthblazorappadmin;Password=P@ssword123;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
 
         /// <summary>
         /// Get all Nutrient records from database.
@@ -49,7 +48,6 @@ namespace Macronutrients.Data
             food.Protein = decimal.Parse(food.Protein.ToString("F2"));
             food.Carbs = decimal.Parse(food.Carbs.ToString("F2"));
             food.Fats = decimal.Parse(food.Fats.ToString("F2"));
-
             if (DoesFoodExist(food))
             {
                 UpdateFood(food); 
@@ -94,14 +92,8 @@ namespace Macronutrients.Data
                     command.Parameters.AddWithValue("@id", food.FoodId);
                     connection.Open();
                     int count = (int)command.ExecuteScalar();
-                    if (count > 0)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
+                    if (count > 0) return true; 
+                    else return false;
                 }
             }
         }
@@ -124,14 +116,8 @@ namespace Macronutrients.Data
                     command.Parameters.AddWithValue("@fats", food.Fats);
                     connection.Open();
                     int rowsAffected = command.ExecuteNonQuery();
-                    if (rowsAffected > 0)
-                    {
-                        Console.WriteLine("Successful update.");
-                    }
-                    else
-                    {
-                        Console.WriteLine("Update failure."); 
-                    }
+                    if (rowsAffected > 0) Console.WriteLine("Successful update."); 
+                    else Console.WriteLine("Update failure.");  
                 }
             }
         }
@@ -212,6 +198,11 @@ namespace Macronutrients.Data
             return null;
         }
 
+        /// <summary>
+        /// Delete a food item by it's id. 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public static bool DeleteFoodById(int id)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -222,17 +213,10 @@ namespace Macronutrients.Data
                     command.Parameters.AddWithValue("@id", id);
                     connection.Open();
                     int rowsAffected = command.ExecuteNonQuery();
-                    if (rowsAffected > 0)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
+                    if (rowsAffected > 0) return true; 
+                    else return false; 
                 }
             }
         }
-
     }
 }
