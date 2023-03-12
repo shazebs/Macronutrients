@@ -10,3 +10,5 @@ CREATE TABLE Macronutrients.dbo.Foods (
     carbs DECIMAL(10,2) NOT NULL,
     fats DECIMAL(10,2) NOT NULL
 );
+
+-- SELECT * FROM Macronutrients.dbo.Foods; 

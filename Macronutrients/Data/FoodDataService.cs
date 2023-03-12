@@ -8,6 +8,86 @@ namespace Macronutrients.Data
         private static readonly string connectionString = @"Server=tcp:macronutrientsdbserver.database.windows.net,1433;Initial Catalog=Macronutrients_db;Persist Security Info=False;User ID=healthblazorappadmin;Password=P@ssword123;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
 
         /// <summary>
+        /// Insert a new Food into the database.
+        /// </summary>
+        /// <param name="food"></param>
+        public static bool CreateNewFood(Food food)
+        {
+            food.Protein = decimal.Parse(food.Protein.ToString("F2"));
+            food.Carbs = decimal.Parse(food.Carbs.ToString("F2"));
+            food.Fats = decimal.Parse(food.Fats.ToString("F2"));
+            if (DoesFoodExist(food))
+            {
+                UpdateFood(food);
+                return true;
+            }
+            var match = GetFoodMatch(food);
+            if (match != null && match.Name == food.Name && match.Protein == food.Protein && match.Carbs == food.Carbs && match.Fats == food.Fats)
+            {
+            }
+            else
+            {
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    var query = "INSERT INTO Foods (name, protein, carbs, fats) VALUES (@name, @protein, @carbs, @fats);";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@name", food.Name);
+                        command.Parameters.AddWithValue("@protein", food.Protein);
+                        command.Parameters.AddWithValue("@carbs", food.Carbs);
+                        command.Parameters.AddWithValue("@fats", food.Fats);
+                        connection.Open();
+                        command.ExecuteNonQuery();
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Delete a food item by it's id. 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public static bool DeleteFoodById(int id)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                var query = "DELETE FROM Foods WHERE id = @id";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@id", id);
+                    connection.Open();
+                    int rowsAffected = command.ExecuteNonQuery();
+                    if (rowsAffected > 0) return true;
+                    else return false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Check if Food exists in database by its FoodId. 
+        /// </summary>
+        /// <param name="food"></param>
+        /// <returns></returns>
+        public static bool DoesFoodExist(Food food)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                var query = "SELECT COUNT(*) FROM Foods WHERE id = @id";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@id", food.FoodId);
+                    connection.Open();
+                    int count = (int)command.ExecuteScalar();
+                    if (count > 0) return true;
+                    else return false;
+                }
+            }
+        }
+
+        /// <summary>
         /// Get all Nutrient records from database.
         /// </summary>
         /// <returns></returns>
@@ -37,89 +117,6 @@ namespace Macronutrients.Data
                 }
             }
             return foods;
-        }
-
-        /// <summary>
-        /// Insert a new Food into the database.
-        /// </summary>
-        /// <param name="food"></param>
-        public static bool CreateNewFood(Food food)
-        {
-            food.Protein = decimal.Parse(food.Protein.ToString("F2"));
-            food.Carbs = decimal.Parse(food.Carbs.ToString("F2"));
-            food.Fats = decimal.Parse(food.Fats.ToString("F2"));
-            if (DoesFoodExist(food))
-            {
-                UpdateFood(food); 
-                return true;
-            }
-            var match = GetFoodMatch(food);
-            if (match != null && match.Name == food.Name && match.Protein == food.Protein && match.Carbs == food.Carbs && match.Fats == food.Fats)
-            {
-            }
-            else
-            {
-                using (SqlConnection connection = new SqlConnection(connectionString))
-                {
-                    var query = "INSERT INTO Foods (name, protein, carbs, fats) VALUES (@name, @protein, @carbs, @fats);";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@name", food.Name);
-                        command.Parameters.AddWithValue("@protein", food.Protein);
-                        command.Parameters.AddWithValue("@carbs", food.Carbs);
-                        command.Parameters.AddWithValue("@fats", food.Fats);
-                        connection.Open();
-                        command.ExecuteNonQuery();
-                        return true;
-                    }
-                }
-            }
-            return false; 
-        }
-
-        /// <summary>
-        /// Check if Food exists in database by its FoodId. 
-        /// </summary>
-        /// <param name="food"></param>
-        /// <returns></returns>
-        public static bool DoesFoodExist(Food food)
-        {
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                var query = "SELECT COUNT(*) FROM Foods WHERE id = @id";
-                using (SqlCommand command = new SqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@id", food.FoodId);
-                    connection.Open();
-                    int count = (int)command.ExecuteScalar();
-                    if (count > 0) return true; 
-                    else return false;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Update Food record in database.
-        /// </summary>
-        /// <param name="food"></param>
-        public static void UpdateFood(Food food)
-        {
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                var query = "UPDATE Foods SET name = @name, protein = @protein, carbs = @carbs, fats = @fats WHERE id = @id";
-                using (SqlCommand command = new SqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@id", food.FoodId);
-                    command.Parameters.AddWithValue("@name", food.Name);
-                    command.Parameters.AddWithValue("@protein", food.Protein);
-                    command.Parameters.AddWithValue("@carbs", food.Carbs);
-                    command.Parameters.AddWithValue("@fats", food.Fats);
-                    connection.Open();
-                    int rowsAffected = command.ExecuteNonQuery();
-                    if (rowsAffected > 0) Console.WriteLine("Successful update."); 
-                    else Console.WriteLine("Update failure.");  
-                }
-            }
         }
 
         /// <summary>
@@ -155,7 +152,7 @@ namespace Macronutrients.Data
                     }
                 }
             }
-            return null; 
+            return null;
         }
 
         /// <summary>
@@ -199,22 +196,25 @@ namespace Macronutrients.Data
         }
 
         /// <summary>
-        /// Delete a food item by it's id. 
+        /// Update Food record in database.
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public static bool DeleteFoodById(int id)
+        /// <param name="food"></param>
+        public static void UpdateFood(Food food)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                var query = "DELETE FROM Foods WHERE id = @id";
+                var query = "UPDATE Foods SET name = @name, protein = @protein, carbs = @carbs, fats = @fats WHERE id = @id";
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@id", id);
+                    command.Parameters.AddWithValue("@id", food.FoodId);
+                    command.Parameters.AddWithValue("@name", food.Name);
+                    command.Parameters.AddWithValue("@protein", food.Protein);
+                    command.Parameters.AddWithValue("@carbs", food.Carbs);
+                    command.Parameters.AddWithValue("@fats", food.Fats);
                     connection.Open();
                     int rowsAffected = command.ExecuteNonQuery();
-                    if (rowsAffected > 0) return true; 
-                    else return false; 
+                    if (rowsAffected > 0) Console.WriteLine("Successful update."); 
+                    else Console.WriteLine("Update failure.");  
                 }
             }
         }

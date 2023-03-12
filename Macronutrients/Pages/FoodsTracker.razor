@@ -67,7 +67,6 @@
                 @* Display Foods *@
                 <label>Foods:</label> <span>@addedFoodsList</span>
                 <br />
-
                 <br />
                 @* Display Protein *@
                 <label>Protein:</label> <span>@totalProtein g</span>
@@ -120,65 +119,10 @@
     private List<Food> foods = FoodDataService.GetAllFoods();
     public Dictionary<Food, int> allFoods { get; set; } = new Dictionary<Food, int>();
     private string addedFoodsList { get; set; } = "";
-    private decimal totalProtein = 0.0M;
+    private decimal totalCalories = 0.0M;
     private decimal totalCarbs = 0.0M;
     private decimal totalFats = 0.0M;
-    private decimal totalCalories = 0.0M;
-
-    /// <summary>
-    /// On page load.
-    /// </summary>
-    protected override void OnInitialized()
-    {
-        foreach (var food in foods) allFoods.Add(food, 0);
-    }
-
-    /// <summary>
-    /// Handle Food Form submit button click.
-    /// </summary>
-    private void HandleNewFood()
-    {
-        newFood.Name = newFood.Name.Trim();
-        var result = FoodDataService.CreateNewFood(newFood);
-        if (result)
-        {
-            foods = FoodDataService.GetAllFoods();
-            SetAllFoods();
-        }
-        newFood = new Food();
-        CalculateMacronutrients();
-    }
-
-    /// <summary>
-    /// Handle Edit Food Item button click.
-    /// </summary>
-    /// <param name="food"></param>
-    private void EditFoodClick(Food food)
-    {
-        newFood = food;
-        StateHasChanged();
-    }
-
-    /// <summary>
-    /// Reset Food Form.
-    /// </summary>
-    private void ClearFoodForm()
-    {
-        newFood = new Food();
-    }
-
-    /// <summary>
-    /// Handle number of servings incrementation.
-    /// </summary>
-    /// <param name="e"></param>
-    /// <param name="food"></param>
-    private void HandleNumberChange(ChangeEventArgs e, Food food)
-    {
-        int value = Convert.ToInt32(e.Value.ToString().Split('.')[0]);
-        var match = allFoods.FirstOrDefault(x => x.Key.FoodId == food.FoodId);
-        allFoods[match.Key] = value;
-        CalculateMacronutrients();
-    }
+    private decimal totalProtein = 0.0M;
 
     /// <summary>
     /// Calculate Macronutrients details.
@@ -203,6 +147,14 @@
     }
 
     /// <summary>
+    /// Reset Food Form.
+    /// </summary>
+    private void ClearFoodForm()
+    {
+        newFood = new Food();
+    }
+
+    /// <summary>
     /// Handle delete Food Item button click.
     /// </summary>
     /// <param name="id"></param>
@@ -217,6 +169,53 @@
         SetAllFoods();
         CalculateMacronutrients();
         StateHasChanged();
+    }
+
+    /// <summary>
+    /// Handle Edit Food Item button click.
+    /// </summary>
+    /// <param name="food"></param>
+    private void EditFoodClick(Food food)
+    {
+        newFood = food;
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Handle Food Form submit button click.
+    /// </summary>
+    private void HandleNewFood()
+    {
+        newFood.Name = newFood.Name.Trim();
+        var result = FoodDataService.CreateNewFood(newFood);
+        if (result)
+        {
+            foods = FoodDataService.GetAllFoods();
+            SetAllFoods();
+        }
+        newFood = new Food();
+        CalculateMacronutrients();
+    }
+
+    /// <summary>
+    /// Handle number of servings incrementation.
+    /// </summary>
+    /// <param name="e"></param>
+    /// <param name="food"></param>
+    private void HandleNumberChange(ChangeEventArgs e, Food food)
+    {
+        int value = Convert.ToInt32(e.Value.ToString().Split('.')[0]);
+        var match = allFoods.FirstOrDefault(x => x.Key.FoodId == food.FoodId);
+        allFoods[match.Key] = value;
+        CalculateMacronutrients();
+    }
+
+    /// <summary>
+    /// On page load.
+    /// </summary>
+    protected override void OnInitialized()
+    {
+        foreach (var food in foods) allFoods.Add(food, 0);
     }
 
     //// <summary>

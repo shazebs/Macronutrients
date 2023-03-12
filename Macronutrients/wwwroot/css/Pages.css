@@ -95,6 +95,10 @@
     width:50%;
 }
 
+.YoutubeEmbed {
+    width:fit-content;
+}
+
 @media (max-width:1000px) {
     #AddFoodForm {
         height:90%;
