@@ -5,6 +5,7 @@ namespace Macronutrients.Data
 {
     public class FoodDataService
     {
+        
         private static readonly string connectionString = @"Server=tcp:macronutrientsdbserver0.database.windows.net,1433;Initial Catalog=Macronutrients_db;Persist Security Info=False;User ID=nlpquan;Password=sukhoi0934004031!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
 
         /// <summary>
