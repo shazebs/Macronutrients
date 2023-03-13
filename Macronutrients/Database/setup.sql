@@ -1,6 +1,6 @@
 ﻿-- DROP DATABASE Macronutrients;
 
-CREATE DATABASE Macronutrients;
+-- CREATE DATABASE Macronutrients;
 
 GO 
 CREATE TABLE Macronutrients.dbo.Foods (
